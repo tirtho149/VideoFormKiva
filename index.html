@@ -69,7 +69,7 @@
       })));
 
       // UPDATED: New Google Apps Script Web App URL
-      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxy2feeTHRStCyKgTuG4nO_5gOwlqLR5lR5TGWQWtWY60pi0Jik_46JV6JQmPPcPsQp/exec';
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI2Xp374W3GIllVxiaNYa_Bd2QP4McoZrVxcmHQo3Rt7X0AGkwJt20KC6bepjroqpY/exec';
 
       const assessmentCategories = {
         'Credibility': 'Appeals based on source expertise, trustworthiness, and authority',
@@ -219,47 +219,35 @@
         const sample = samplesData[sampleIndex];
 
         try {
-          const submissionData = {
+          // CHANGED: Use GET request with URL parameters instead of POST to avoid CORS
+          const params = new URLSearchParams({
             action: 'submitRating',
             evaluatorId: evaluatorId,
             pitchId: assignedPitches[sampleIndex],
-            sampleNumber: currentPage,
+            sampleNumber: currentPage.toString(),
             investmentPercentage: sample.investmentPercentage,
             investmentAmount: pitchesContent[sampleIndex]?.loanAmount 
               ? (parseFloat(pitchesContent[sampleIndex].loanAmount) * parseInt(sample.investmentPercentage) / 100).toFixed(2)
               : '0',
-            ratings: {
-              credibility: {
-                economic: sample.economicCredibility,
-                environmental: sample.environmentalCredibility,
-                social: sample.socialCredibility
-              },
-              emotionalAppeal: {
-                economic: sample.economicEmotionalAppeal,
-                environmental: sample.environmentalEmotionalAppeal,
-                social: sample.socialEmotionalAppeal
-              },
-              logic: {
-                economic: sample.economicLogic,
-                environmental: sample.environmentalLogic,
-                social: sample.socialLogic
-              },
-              timing: {
-                economic: sample.economicTiming,
-                environmental: sample.environmentalTiming,
-                social: sample.socialTiming
-              }
-            },
+            // Flatten ratings into URL parameters
+            economicCredibility: sample.economicCredibility,
+            environmentalCredibility: sample.environmentalCredibility,
+            socialCredibility: sample.socialCredibility,
+            economicEmotionalAppeal: sample.economicEmotionalAppeal,
+            environmentalEmotionalAppeal: sample.environmentalEmotionalAppeal,
+            socialEmotionalAppeal: sample.socialEmotionalAppeal,
+            economicLogic: sample.economicLogic,
+            environmentalLogic: sample.environmentalLogic,
+            socialLogic: sample.socialLogic,
+            economicTiming: sample.economicTiming,
+            environmentalTiming: sample.environmentalTiming,
+            socialTiming: sample.socialTiming,
             timestamp: new Date().toISOString()
-          };
-
-          console.log('Submitting pitch data:', submissionData);
-
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(submissionData)
           });
+
+          console.log('Submitting pitch data via GET');
+
+          const response = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
 
           console.log('Response status:', response.status);
           const result = await response.json();
