@@ -75,8 +75,16 @@
 
       const INSTRUCTOR_EMAIL = 'tirthoroyapon@gmail.com';
       
-      // All available pitch IDs - student gets random 5
-      const ALL_PITCH_IDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+      // All available pitch IDs - randomly selects 5 for each student
+      const ALL_PITCH_IDS = [
+        '1003069','1018380','1022768','1074303','1075201','1187646','1215038',
+        '1251056','1344909','1382839','1388266','1464366','1493787','1506362',
+        '1585082','1666920','1714294','1764588','1845524','1875317','1903631',
+        '1966153','1987908','2000570','2072560','2073020','2204513','2323118',
+        '2411897','2455683','2493379','2496143','2570030','2627220','2649988',
+        '2674037','2727001','2771616','2844410','2847653','608586','720756',
+        '729317','773122','787501','837078','851464','859453','922765','974241'
+      ];
 
       const assessmentCategories = {
         'Credibility': 'Appeals based on source expertise, trustworthiness, and authority',
@@ -117,14 +125,17 @@
             const response = await fetch(`./data/${pitchId}.json`);
             if (response.ok) {
               const data = await response.json();
+              // Fix image path to use correct location
               if (data.image && !data.image.startsWith('http')) {
-                data.image = `https://raw.githubusercontent.com/tirtho149/Form/main/${data.image}`;
+                // Assuming images are in the same directory structure
+                data.image = `./${data.image}`;
               }
               contents.push(data);
             } else {
+              console.error(`Failed to load ${pitchId}.json`);
               contents.push({ 
                 Name: `Pitch ${pitchId}`, 
-                description: 'Pitch description will be loaded here.',
+                description: 'Pitch description could not be loaded.',
                 image: '',
                 loanAmount: '0'
               });
@@ -133,7 +144,7 @@
             console.error(`Error loading ${pitchId}:`, error);
             contents.push({ 
               Name: `Pitch ${pitchId}`, 
-              description: 'Pitch description will be loaded here.',
+              description: 'Pitch description could not be loaded.',
               image: '',
               loanAmount: '0'
             });
