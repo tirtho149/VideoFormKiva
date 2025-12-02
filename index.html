@@ -123,14 +123,18 @@
         for (const pitchId of pitchIds) {
           try {
             const response = await fetch(`./data/${pitchId}.json`);
-            if (response.ok) {
-              const data = await response.json();
-              // Fix image path to use correct location
-              if (data.image && !data.image.startsWith('http')) {
-                // Assuming images are in the same directory structure
-                data.image = `./${data.image}`;
-              }
-              contents.push(data);
+if (response.ok) {
+  const data = await response.json();
+  // Fix image path to use correct location
+  if (data.image && !data.image.startsWith('http')) {
+    // Assuming images are in the same directory structure
+    data.image = `./${data.image}`;
+  }
+  
+  // Automatically add video URL based on pitch ID
+  data.video = `https://cdn.jsdelivr.net/gh/tirtho149/VideoFormKiva@main/videos/${pitchId}.mp4`;
+  
+  contents.push(data);
             } else {
               console.error(`Failed to load ${pitchId}.json`);
               contents.push({ 
